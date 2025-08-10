@@ -65,7 +65,7 @@
       if (data.success) {
         resultDiv.innerHTML = `
           <h2>${data.heading}</h2>
-          <p>${data.message}</p>
+          <p>${data.message.replace(/\n/g, '<br>')}</p>
           <div class="timestamp">Last updated: ${new Date(data.timestamp).toLocaleString()}</div>
         `;
       } else {
