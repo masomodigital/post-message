@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>View Masomo Message</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; padding: 10px; }
+  label { display: block; margin-top: 15px; }
+  input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+  button { margin-top: 20px; padding: 10px 15px; font-size: 16px; }
+  #result { margin-top: 25px; white-space: pre-wrap; background: #f0f0f0; padding: 15px; border-radius: 5px; }
+  .error { color: red; }
+  .timestamp { font-size: 0.9em; color: #555; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h2>View User Message</h2>
+
+<form id="viewForm">
+  <label for="ownerId">Owner National ID:</label>
+  <input type="text" id="ownerId" name="ownerId" required />
+
+  <label for="phone">Your Phone Number:</label>
+  <input type="text" id="phone" name="phone" required placeholder="e.g., 715399449" />
+
+  <button type="submit">View Message</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+  const form = document.getElementById('viewForm');
+  const resultDiv = document.getElementById('result');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    resultDiv.textContent = "Loading...";
+
+    const ownerId = form.ownerId.value.trim();
+    const phone = form.phone.value.trim();
+
+    if (!ownerId || !phone) {
+      resultDiv.textContent = "Please fill in both fields.";
+      resultDiv.className = "error";
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.append('action', 'view');
+    params.append('ownerId', ownerId);
+    params.append('phone', phone);
+
+    try {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbzJasm8v5Bav1z6pqa015Cbrjf96omdGcAEXWk201z9J2ijfv3f3RwZ9BI_KZ15pk1MGg/exec', {
+        method: 'POST',
+        body: params,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        resultDiv.className = "";
+        resultDiv.innerHTML = `<strong>Message:</strong>\n${data.message}<br/><div class="timestamp">Last updated: ${new Date(data.timestamp).toLocaleString()}</div>`;
+      } else {
+        resultDiv.className = "error";
+        resultDiv.textContent = data.error || "Unknown error occurred.";
+      }
+    } catch (err) {
+      resultDiv.className = "error";
+      resultDiv.textContent = "Request failed: " + err.message;
+    }
+  });
+</script>
+
+</body>
+</html>
