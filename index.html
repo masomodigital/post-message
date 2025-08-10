@@ -9,9 +9,10 @@
   label { display: block; margin-top: 15px; }
   input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
   button { margin-top: 20px; padding: 10px 15px; font-size: 16px; }
-  #result { margin-top: 25px; white-space: pre-wrap; background: #f0f0f0; padding: 15px; border-radius: 5px; }
+  #result { margin-top: 25px; background: #f0f0f0; padding: 15px; border-radius: 5px; }
   .error { color: red; }
   .timestamp { font-size: 0.9em; color: #555; margin-top: 10px; }
+  #result h2 { color: red; margin-top: 0; }
 </style>
 </head>
 <body>
@@ -37,6 +38,7 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     resultDiv.textContent = "Loading...";
+    resultDiv.className = "";
 
     const ownerId = form.ownerId.value.trim();
     const phone = form.phone.value.trim();
@@ -61,8 +63,11 @@
       const data = await response.json();
 
       if (data.success) {
-        resultDiv.className = "";
-        resultDiv.innerHTML = `<strong>Message:</strong>\n${data.message}<br/><div class="timestamp">Last updated: ${new Date(data.timestamp).toLocaleString()}</div>`;
+        resultDiv.innerHTML = `
+          <h2>${data.heading}</h2>
+          <p>${data.message}</p>
+          <div class="timestamp">Last updated: ${new Date(data.timestamp).toLocaleString()}</div>
+        `;
       } else {
         resultDiv.className = "error";
         resultDiv.textContent = data.error || "Unknown error occurred.";
@@ -76,3 +81,4 @@
 
 </body>
 </html>
+
